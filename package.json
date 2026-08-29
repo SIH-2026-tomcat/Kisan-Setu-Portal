@@ -1,0 +1,25 @@
+{
+  "name": "kisan-setu",
+  "version": "1.0.0",
+  "description": "Kisan Setu — Smart Procurement. Less Waiting. Better Farming. (SIH Problem Statement 26032)",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently -n \"SERVER,CLIENT\" -c \"blue,green\" \"npm run dev --prefix server\" \"npm run dev --prefix client\"",
+    "build": "npm run build --prefix server && npm run build --prefix client",
+    "seed": "npm run seed --prefix server",
+    "reset-demo": "npm run reset-demo --prefix server",
+    "install:all": "npm install && npm install --prefix server && npm install --prefix client"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  },
+  "keywords": [
+    "kisan-setu",
+    "smart-india-hackathon",
+    "agriculture",
+    "procurement",
+    "queue-management"
+  ],
+  "author": "Kisan Setu Team",
+  "license": "ISC"
+}

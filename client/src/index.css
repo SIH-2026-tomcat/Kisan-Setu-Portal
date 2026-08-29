@@ -1,0 +1,70 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --text-scale: 1rem;
+    --navy-primary: #123B63;
+    --navy-secondary: #1F5A85;
+    --agri-green: #2E7D32;
+    --bg-page: #F5F7FA;
+  }
+
+  body {
+    font-size: var(--text-scale);
+    background-color: var(--bg-page);
+    color: #1e293b;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  }
+
+  /* High Contrast Mode */
+  body.high-contrast {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+  }
+
+  body.high-contrast .bg-white,
+  body.high-contrast .bg-surface-card {
+    background-color: #121212 !important;
+    color: #ffffff !important;
+    border-color: #ffffff !important;
+  }
+
+  body.high-contrast .text-slate-600,
+  body.high-contrast .text-slate-500,
+  body.high-contrast .text-surface-muted {
+    color: #e2e8f0 !important;
+  }
+
+  body.high-contrast .border-slate-200,
+  body.high-contrast .border-surface-border {
+    border-color: #ffffff !important;
+  }
+}
+
+/* Accessibility Focus States */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 3px solid #123B63;
+  outline-offset: 2px;
+}
+
+/* Print Styles for Digital Token */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #printable-token,
+  #printable-token * {
+    visibility: visible;
+  }
+  #printable-token {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+}

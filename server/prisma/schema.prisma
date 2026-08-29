@@ -1,0 +1,189 @@
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Farmer {
+  id                String            @id @default(uuid())
+  fullName          String
+  mobileNumber      String            @unique
+  aadhaarEncrypted  String            @db.Text
+  aadhaarLast4      String            @db.VarChar(4)
+  preferredLanguage String            @default("en")
+  village           String
+  district          String
+  state             String
+  centreId          String?
+  centre            ProcurementCentre? @relation(fields: [centreId], references: [id])
+  bookings          Booking[]
+  procurements      Procurement[]
+  payments          Payment[]
+  notifications     Notification[]
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+
+  @@index([mobileNumber])
+  @@index([district])
+}
+
+model Officer {
+  id           String             @id @default(uuid())
+  username     String             @unique
+  passwordHash String
+  fullName     String
+  centreId     String
+  centre       ProcurementCentre  @relation(fields: [centreId], references: [id])
+  role         String             @default("OFFICER")
+  active       Boolean            @default(true)
+  lastLogin    DateTime?
+  auditLogs    AuditLog[]
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+
+  @@index([username])
+}
+
+model ProcurementCentre {
+  id          String      @id @default(uuid())
+  name        String
+  district    String
+  state       String
+  address     String
+  openingTime String      @default("09:00")
+  closingTime String      @default("17:00")
+  active      Boolean     @default(true)
+  slots       Slot[]
+  bookings    Booking[]
+  officers    Officer[]
+  farmers     Farmer[]
+  queues      Queue[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@index([district])
+}
+
+model Slot {
+  id          String            @id @default(uuid())
+  centreId    String
+  centre      ProcurementCentre @relation(fields: [centreId], references: [id])
+  date        String            // Format: YYYY-MM-DD
+  startTime   String            // Format: "09:00"
+  endTime     String            // Format: "10:00"
+  capacity    Int               @default(10)
+  bookedCount Int               @default(0)
+  bookings    Booking[]
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  @@unique([centreId, date, startTime])
+  @@index([centreId, date])
+}
+
+model Booking {
+  id               String            @id @default(uuid())
+  farmerId         String
+  farmer           Farmer            @relation(fields: [farmerId], references: [id])
+  centreId         String
+  centre           ProcurementCentre @relation(fields: [centreId], references: [id])
+  slotId           String
+  slot             Slot              @relation(fields: [slotId], references: [id])
+  bookingReference String            @unique // e.g. KS-26032-1847
+  tokenNumber      String            // e.g. A-042
+  cropType         String            // Paddy, Wheat, Maize, Groundnut, Cotton, Onion
+  expectedQuantity Float             // in Quintals
+  status           String            @default("BOOKED") // BOOKED, ARRIVED, INSPECTED, COMPLETED, CANCELLED
+  procurement      Procurement?
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+
+  @@index([centreId, slotId])
+  @@index([farmerId])
+  @@index([tokenNumber])
+}
+
+model Queue {
+  id               String            @id @default(uuid())
+  centreId         String
+  centre           ProcurementCentre @relation(fields: [centreId], references: [id])
+  date             String            // Format: YYYY-MM-DD
+  currentlyServing String?           // e.g. A-036
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+
+  @@unique([centreId, date])
+}
+
+model Procurement {
+  id               String            @id @default(uuid())
+  bookingId        String            @unique
+  booking          Booking           @relation(fields: [bookingId], references: [id])
+  farmerId         String
+  farmer           Farmer            @relation(fields: [farmerId], references: [id])
+  cropType         String
+  expectedQuantity Float
+  acceptedQuantity Float?
+  qualityGrade     String?           // Grade A, Grade B, Grade C
+  ratePerQuintal   Float?
+  totalAmount      Float?
+  status           String            @default("PENDING_INSPECTION") // PENDING_INSPECTION, INSPECTED, APPROVED, REJECTED
+  inspectedAt      DateTime?
+  approvedAt       DateTime?
+  payment          Payment?
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+
+  @@index([farmerId])
+  @@index([status])
+}
+
+model Payment {
+  id                   String      @id @default(uuid())
+  procurementId        String      @unique
+  procurement          Procurement @relation(fields: [procurementId], references: [id])
+  farmerId             String
+  farmer               Farmer      @relation(fields: [farmerId], references: [id])
+  amount               Float
+  status               String      @default("PENDING") // PENDING, PROCESSING, PAID
+  transactionReference String?     @unique // e.g. KS-PAY-2026-58491
+  bankAccountLast4     String      @default("4582")
+  processingAt         DateTime?
+  paidAt               DateTime?
+  createdAt            DateTime    @default(now())
+  updatedAt            DateTime    @updatedAt
+
+  @@index([farmerId])
+  @@index([status])
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  farmerId  String
+  farmer    Farmer   @relation(fields: [farmerId], references: [id])
+  type      String   // SLOT_CONFIRMED, QUEUE_UPDATE, TURN_APPROACHING, PROCUREMENT_APPROVED, PAYMENT_PROCESSING, PAYMENT_COMPLETED
+  title     String
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([farmerId])
+}
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  officerId  String?
+  officer    Officer? @relation(fields: [officerId], references: [id])
+  action     String   // LOGIN, CALL_NEXT, MARK_ARRIVED, CROP_INSPECTION, APPROVE_PROCUREMENT, PROCESS_PAYMENT, COMPLETE_PAYMENT
+  entityType String   // Booking, Queue, Procurement, Payment, Officer
+  entityId   String
+  details    String?  @db.Text
+  ipAddress  String?
+  createdAt  DateTime @default(now())
+
+  @@index([officerId])
+  @@index([action])
+}
