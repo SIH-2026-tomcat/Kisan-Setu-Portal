@@ -135,14 +135,14 @@ export const FarmerRegister: React.FC = () => {
 
   return (
     <div className="min-h-[85vh] flex items-center justify-center px-4 py-10">
-      <div className="max-w-xl w-full bg-white rounded-2xl shadow-xl border border-slate-200 p-6 sm:p-8 space-y-6">
+      <div className="max-w-xl w-full bg-white rounded-2xl shadow-xl border border-line p-6 sm:p-8 space-y-6">
         {/* Header */}
         <div className="text-center space-y-1">
-          <div className="inline-flex p-2.5 rounded-full bg-navy-50 text-navy-800 border border-navy-100">
+          <div className="inline-flex p-2.5 rounded-full bg-green-50 text-india-green border border-line">
             <Wheat className="w-7 h-7" />
           </div>
-          <h2 className="text-2xl font-bold text-navy-900">{t('register.title')}</h2>
-          <p className="text-xs text-slate-500">
+          <h2 className="text-2xl font-bold text-ink">{t('register.title')}</h2>
+          <p className="text-xs text-muted">
             One-time registration for seamless slot booking and queue priority
           </p>
         </div>
@@ -154,10 +154,10 @@ export const FarmerRegister: React.FC = () => {
               <div
                 className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition ${
                   step === s
-                    ? 'bg-navy-800 text-white ring-4 ring-navy-100'
+                    ? 'bg-india-green text-white ring-4 ring-green-100'
                     : step > s
-                    ? 'bg-emerald-600 text-white'
-                    : 'bg-slate-100 text-slate-400 border border-slate-300'
+                    ? 'bg-india-green_deep text-white'
+                    : 'bg-paper text-muted border border-line'
                 }`}
               >
                 {s}
@@ -165,7 +165,7 @@ export const FarmerRegister: React.FC = () => {
               {s < 5 && (
                 <div
                   className={`w-6 sm:w-12 h-1 mx-1 rounded ${
-                    step > s ? 'bg-emerald-500' : 'bg-slate-200'
+                    step > s ? 'bg-india-green' : 'bg-line'
                   }`}
                 />
               )}
@@ -410,15 +410,15 @@ export const FarmerRegister: React.FC = () => {
                 </div>
               </div>
 
-              <label className="flex items-start gap-2.5 cursor-pointer bg-navy-50/60 p-3 rounded-xl border border-navy-100">
+              <label className="flex items-start gap-2.5 cursor-pointer bg-green-50/60 p-3 rounded-xl border border-line">
                 <input
                   type="checkbox"
                   checked={formData.consent}
                   onChange={(e) => handleChange('consent', e.target.checked)}
-                  className="mt-0.5 rounded text-navy-800 focus:ring-navy-800"
+                  className="mt-0.5 rounded text-india-green focus:ring-india-green"
                   required
                 />
-                <span className="text-xs text-slate-700 leading-relaxed font-medium">
+                <span className="text-xs text-muted leading-relaxed font-medium">
                   {t('register.declaration')}
                 </span>
               </label>
@@ -426,12 +426,12 @@ export const FarmerRegister: React.FC = () => {
           )}
 
           {/* Navigation Buttons */}
-          <div className="flex items-center justify-between pt-6 border-t border-slate-100 gap-3">
+          <div className="flex items-center justify-between pt-6 border-t border-line gap-3">
             {step > 1 ? (
               <button
                 type="button"
                 onClick={handleBack}
-                className="px-4 py-2.5 rounded-xl border border-slate-300 text-slate-700 text-xs font-bold hover:bg-slate-100 flex items-center gap-1.5 transition"
+                className="px-4 py-2.5 rounded-xl border border-line text-muted text-xs font-bold hover:bg-paper flex items-center gap-1.5 transition active:scale-[0.98]"
               >
                 <ArrowLeft className="w-4 h-4" />
                 <span>{t('register.back')}</span>
@@ -444,7 +444,7 @@ export const FarmerRegister: React.FC = () => {
               <button
                 type="button"
                 onClick={handleNext}
-                className="ml-auto px-6 py-2.5 bg-navy-800 hover:bg-navy-900 text-white text-xs font-bold rounded-xl shadow transition flex items-center gap-1.5"
+                className="ml-auto px-6 py-2.5 bg-india-green hover:bg-green-700 text-white text-xs font-bold rounded-xl shadow transition flex items-center gap-1.5 active:scale-[0.98]"
               >
                 <span>{t('register.next')}</span>
                 <ArrowRight className="w-4 h-4" />
@@ -453,7 +453,7 @@ export const FarmerRegister: React.FC = () => {
               <button
                 type="submit"
                 disabled={loading || !formData.consent}
-                className="ml-auto px-6 py-2.5 bg-agri-700 hover:bg-agri-800 disabled:bg-slate-300 text-white text-xs font-bold rounded-xl shadow-lg transition flex items-center gap-1.5"
+                className="ml-auto px-6 py-2.5 bg-india-green hover:bg-green-700 disabled:bg-slate-300 text-white text-xs font-bold rounded-xl shadow-lg transition flex items-center gap-1.5 active:scale-[0.98]"
               >
                 <ShieldCheck className="w-4 h-4" />
                 <span>{loading ? 'Registering...' : t('register.submit')}</span>
@@ -463,7 +463,7 @@ export const FarmerRegister: React.FC = () => {
         </form>
 
         <div className="pt-2 text-center">
-          <Link to="/login" className="text-xs font-medium text-navy-800 hover:underline">
+          <Link to="/login" className="text-xs font-bold text-india-green hover:underline">
             Already registered? Login with OTP here
           </Link>
         </div>

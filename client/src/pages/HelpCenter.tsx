@@ -43,40 +43,40 @@ export const HelpCenter: React.FC = () => {
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-      <div className="text-center space-y-2 border-b border-slate-200 pb-6">
-        <div className="inline-flex p-3 rounded-full bg-navy-50 text-navy-800 border border-navy-100">
+      <div className="text-center space-y-2 border-b border-line pb-6">
+        <div className="inline-flex p-3 rounded bg-green-50 text-india-green border border-green-100">
           <HelpCircle className="w-8 h-8" />
         </div>
-        <h1 className="text-3xl font-bold text-navy-900">Help & Support Centre</h1>
-        <p className="text-sm text-slate-600 max-w-lg mx-auto">
+        <h1 className="text-3xl font-bold text-ink">Help & Support Centre</h1>
+        <p className="text-sm text-muted max-w-lg mx-auto">
           Answers to common questions regarding slot booking, queue tracking, and payments.
         </p>
       </div>
 
       {/* Helpline Contact Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-2">
-          <Phone className="w-5 h-5 text-emerald-600" />
-          <h3 className="font-bold text-sm text-slate-800">Toll-Free Helpline</h3>
-          <p className="text-xs text-slate-600">1800-425-26032 (Mon–Sat, 8 AM–8 PM)</p>
+        <div className="bg-white p-5 rounded border border-line shadow-sm space-y-2">
+          <Phone className="w-5 h-5 text-india-green" />
+          <h3 className="font-bold text-sm text-ink">Toll-Free Helpline</h3>
+          <p className="text-xs text-muted">1800-425-26032 (Mon–Sat, 8 AM–8 PM)</p>
         </div>
 
-        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-2">
-          <Mail className="w-5 h-5 text-navy-800" />
-          <h3 className="font-bold text-sm text-slate-800">Email Support</h3>
-          <p className="text-xs text-slate-600">support@kisansetu.in</p>
+        <div className="bg-white p-5 rounded border border-line shadow-sm space-y-2">
+          <Mail className="w-5 h-5 text-india-green" />
+          <h3 className="font-bold text-sm text-ink">Email Support</h3>
+          <p className="text-xs text-muted">support@kisansetu.in</p>
         </div>
 
-        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-2">
-          <MapPin className="w-5 h-5 text-amber-600" />
-          <h3 className="font-bold text-sm text-slate-800">Guntur Control Desk</h3>
-          <p className="text-xs text-slate-600">Market Yard Road, Guntur APMC</p>
+        <div className="bg-white p-5 rounded border border-line shadow-sm space-y-2">
+          <MapPin className="w-5 h-5 text-india-saffron" />
+          <h3 className="font-bold text-sm text-ink">Guntur Control Desk</h3>
+          <p className="text-xs text-muted">Market Yard Road, Guntur APMC</p>
         </div>
       </div>
 
       {/* FAQ Accordion */}
-      <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-4">
-        <h2 className="text-lg font-bold text-navy-900 border-b border-slate-100 pb-3">
+      <div className="bg-white rounded p-6 border border-line shadow-sm space-y-4">
+        <h2 className="text-lg font-bold text-ink border-b border-line pb-3">
           Frequently Asked Questions
         </h2>
 
@@ -84,22 +84,22 @@ export const HelpCenter: React.FC = () => {
           {faqs.map((faq, idx) => (
             <div
               key={idx}
-              className="border border-slate-200 rounded-xl overflow-hidden transition"
+              className="border border-line rounded overflow-hidden transition"
             >
               <button
                 onClick={() => toggleFaq(idx)}
-                className="w-full p-4 text-left font-bold text-sm text-slate-800 bg-slate-50/50 hover:bg-slate-100 flex items-center justify-between gap-3"
+                className="w-full p-4 text-left font-bold text-sm text-ink bg-paper hover:bg-gray-50 flex items-center justify-between gap-3"
               >
                 <span>{faq.q}</span>
                 {openIndex === idx ? (
-                  <ChevronUp className="w-4 h-4 text-navy-800 shrink-0" />
+                  <ChevronUp className="w-4 h-4 text-india-green shrink-0" />
                 ) : (
-                  <ChevronDown className="w-4 h-4 text-slate-400 shrink-0" />
+                  <ChevronDown className="w-4 h-4 text-muted shrink-0" />
                 )}
               </button>
 
               {openIndex === idx && (
-                <div className="p-4 text-xs text-slate-600 bg-white border-t border-slate-200 leading-relaxed">
+                <div className="p-4 text-xs text-muted bg-white border-t border-line leading-relaxed">
                   {faq.a}
                 </div>
               )}

@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { api } from '../services/api';
 import { Shield, Clock, FileCheck, RefreshCw } from 'lucide-react';
 
 export const OfficerAudit: React.FC = () => {
+  const { t } = useTranslation();
   const [logs, setLogs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -29,10 +31,10 @@ export const OfficerAudit: React.FC = () => {
         <div>
           <div className="flex items-center gap-2">
             <Shield className="w-6 h-6 text-navy-800" />
-            <h1 className="text-2xl font-bold text-navy-900">Procurement Centre Audit Log Trail</h1>
+            <h1 className="text-2xl font-bold text-navy-900">{t('officer.auditTitle')}</h1>
           </div>
           <p className="text-xs text-slate-500">
-            Immutable log of officer actions, queue advances, quality inspection approvals, and payments
+            {t('officer.auditDesc')}
           </p>
         </div>
 
@@ -41,7 +43,7 @@ export const OfficerAudit: React.FC = () => {
           className="flex items-center gap-1.5 text-xs text-navy-800 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-lg font-semibold"
         >
           <RefreshCw className="w-3.5 h-3.5" />
-          <span>Refresh Audit Logs</span>
+          <span>{t('officer.refreshRecords')}</span>
         </button>
       </div>
 
@@ -51,8 +53,8 @@ export const OfficerAudit: React.FC = () => {
             <thead className="bg-slate-100 text-slate-800 uppercase font-bold border-b border-slate-200">
               <tr>
                 <th className="px-4 py-3">Timestamp</th>
-                <th className="px-4 py-3">Officer / User</th>
-                <th className="px-4 py-3">Action</th>
+                <th className="px-4 py-3">{t('officer.farmerDetails')}</th>
+                <th className="px-4 py-3">{t('officer.actions')}</th>
                 <th className="px-4 py-3">Entity Affected</th>
                 <th className="px-4 py-3">Details</th>
               </tr>

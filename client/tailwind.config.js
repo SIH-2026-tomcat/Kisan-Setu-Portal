@@ -7,31 +7,31 @@ export default {
   theme: {
     extend: {
       colors: {
-        navy: {
-          900: '#0c233c',
-          800: '#123B63',
-          700: '#1F5A85',
-          600: '#2A72A4',
-          100: '#E8F1F8',
-          50: '#F0F6FA',
+        india: {
+          green: '#15803D', // Agricultural Green
+          green_deep: '#166534', // Deep Green
+          green_fresh: '#22C55E', // Fresh Green
+          saffron: '#F59E0B', // Warm Saffron Accent
+          saffron_hover: '#D97706',
         },
-        agri: {
-          800: '#1B5E20',
-          700: '#2E7D32',
-          600: '#388E3C',
-          500: '#4CAF50',
-          100: '#E8F5E9',
-          50: '#F1F8E9',
+        chakra: {
+          blue: '#1A4B9C',
         },
-        surface: {
-          bg: '#F5F7FA',
-          card: '#FFFFFF',
-          border: '#DDE3EA',
-          muted: '#64748B',
-        }
+        paper: '#F8FAF7', // BACKGROUND
+        surface: '#FFFFFF', // SURFACE
+        ink: '#17231B', // PRIMARY TEXT
+        muted: '#647067', // SECONDARY TEXT
+        line: '#DDE6DF', // BORDER
+        error: '#DC2626',
+        warning: '#D97706',
+        success: '#15803D',
+        info: '#2563EB',
       },
       fontFamily: {
-        sans: ['Inter', 'Segoe UI', 'Roboto', 'system-ui', 'sans-serif'],
+        sans: ['Inter', 'Noto Sans', 'Segoe UI', 'Roboto', 'system-ui', 'sans-serif'],
+      },
+      maxWidth: {
+        'reading': '65ch',
       }
     },
   },

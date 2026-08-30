@@ -3,11 +3,13 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { AccessibilityProvider } from './context/AccessibilityContext';
 import { ToastProvider } from './context/ToastContext';
+import { LocationProvider } from './context/LocationContext';
 import './i18n/i18n';
 
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
 import { LanguageModal } from './components/LanguageModal';
+import { KisanMitraChatbot } from './components/KisanMitraChatbot';
 
 import { Home } from './pages/Home';
 import { FarmerLogin } from './pages/FarmerLogin';
@@ -56,7 +58,8 @@ export const App: React.FC = () => {
       <AccessibilityProvider>
         <AuthProvider>
           <ToastProvider>
-            <div className="flex flex-col min-h-screen">
+            <LocationProvider>
+              <div className="flex flex-col min-h-screen">
               {/* Critical First Screen Language Selection Modal */}
               <LanguageModal />
 
@@ -135,8 +138,10 @@ export const App: React.FC = () => {
               </main>
 
               <Footer />
+              <KisanMitraChatbot />
             </div>
-          </ToastProvider>
+          </LocationProvider>
+        </ToastProvider>
         </AuthProvider>
       </AccessibilityProvider>
     </BrowserRouter>

@@ -84,19 +84,42 @@ export const api = {
     return apiRequest(`/queue/${centreId}?${q.toString()}`);
   },
 
-  // Farmer Tracking
+  // Farmer Tracking & Assistant
   getMyProcurements: () => apiRequest('/farmer/procurements'),
   getMyPayments: () => apiRequest('/farmer/payments'),
   getMyNotifications: () => apiRequest('/farmer/notifications'),
   markNotificationRead: (id: string) =>
     apiRequest(`/farmer/notifications/${id}/read`, { method: 'PATCH' }),
+  sendAssistantMessage: (message: string, language: string) =>
+    apiRequest('/farmer/assistant/message', { method: 'POST', body: JSON.stringify({ message, language }) }),
 
   // Officer Operations
-  getOfficerDashboard: () => apiRequest('/officer/dashboard'),
-  getOfficerQueue: () => apiRequest('/officer/queue'),
-  callNextFarmer: () => apiRequest('/officer/queue/next', { method: 'POST' }),
+  getOfficerDashboard: (centreId?: string) => {
+    const q = new URLSearchParams();
+    if (centreId) q.append('centreId', centreId);
+    return apiRequest(`/officer/dashboard?${q.toString()}`);
+  },
+  getOfficerQueue: (params?: { date?: string; centreId?: string }) => {
+    const q = new URLSearchParams();
+    if (params?.date) q.append('date', params.date);
+    if (params?.centreId) q.append('centreId', params.centreId);
+    return apiRequest(`/officer/queue?${q.toString()}`);
+  },
+  callNextFarmer: (payload?: { centreId?: string }) =>
+    apiRequest('/officer/queue/next', { method: 'POST', body: JSON.stringify(payload || {}) }),
   markFarmerArrived: (bookingId: string) =>
     apiRequest('/officer/mark-arrived', { method: 'POST', body: JSON.stringify({ bookingId }) }),
+  holdBooking: (bookingId: string) =>
+    apiRequest(`/officer/bookings/${bookingId}/hold`, { method: 'POST' }),
+  getReassignmentSlots: (bookingId: string) =>
+    apiRequest(`/officer/bookings/${bookingId}/reassignment-slots`),
+  reassignBooking: (bookingId: string, targetSlotId: string) =>
+    apiRequest(`/officer/bookings/${bookingId}/reassign`, {
+      method: 'POST',
+      body: JSON.stringify({ targetSlotId }),
+    }),
+  cancelMissedBooking: (bookingId: string) =>
+    apiRequest(`/officer/bookings/${bookingId}/cancel-missed`, { method: 'POST' }),
   processProcurement: (procurementId: string, payload: any) =>
     apiRequest(`/officer/procurement/${procurementId}/status`, {
       method: 'PATCH',

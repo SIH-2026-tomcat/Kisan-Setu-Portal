@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -5,41 +7,16 @@
 @layer base {
   :root {
     --text-scale: 1rem;
-    --navy-primary: #123B63;
-    --navy-secondary: #1F5A85;
-    --agri-green: #2E7D32;
-    --bg-page: #F5F7FA;
+    --bg-page: #F8FAF7;
   }
 
   body {
     font-size: var(--text-scale);
     background-color: var(--bg-page);
-    color: #1e293b;
-    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-  }
-
-  /* High Contrast Mode */
-  body.high-contrast {
-    background-color: #000000 !important;
-    color: #ffffff !important;
-  }
-
-  body.high-contrast .bg-white,
-  body.high-contrast .bg-surface-card {
-    background-color: #121212 !important;
-    color: #ffffff !important;
-    border-color: #ffffff !important;
-  }
-
-  body.high-contrast .text-slate-600,
-  body.high-contrast .text-slate-500,
-  body.high-contrast .text-surface-muted {
-    color: #e2e8f0 !important;
-  }
-
-  body.high-contrast .border-slate-200,
-  body.high-contrast .border-surface-border {
-    border-color: #ffffff !important;
+    color: #17231B; /* primary ink text */
+    font-family: 'Inter', 'Noto Sans', system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 }
 
@@ -48,7 +25,7 @@ a:focus-visible,
 button:focus-visible,
 input:focus-visible,
 select:focus-visible {
-  outline: 3px solid #123B63;
+  outline: 3px solid #15803D; /* agricultural green focus */
   outline-offset: 2px;
 }
 

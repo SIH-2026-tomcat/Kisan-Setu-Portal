@@ -4,6 +4,8 @@ import { useTranslation } from 'react-i18next';
 import { api } from '../services/api';
 import { Procurement } from '../types';
 import { StatusStepper, StepInfo } from '../components/StatusStepper';
+import { DigitalReceiptModal } from '../components/DigitalReceiptModal';
+import { formatDualQuantity, fromKilograms } from '../utils/quantity';
 import {
   Layers,
   CheckCircle,
@@ -15,6 +17,11 @@ import {
   RefreshCw,
   Scale,
   Award,
+  FileText,
+  AlertTriangle,
+  XCircle,
+  ShieldCheck,
+  ChevronRight,
 } from 'lucide-react';
 
 export const TrackProcurement: React.FC = () => {
@@ -22,6 +29,7 @@ export const TrackProcurement: React.FC = () => {
   const [procurements, setProcurements] = useState<Procurement[]>([]);
   const [loading, setLoading] = useState(true);
   const [lastRefreshed, setLastRefreshed] = useState('');
+  const [selectedReceiptProcurement, setSelectedReceiptProcurement] = useState<Procurement | null>(null);
 
   const fetchProcurements = async () => {
     try {
@@ -44,11 +52,25 @@ export const TrackProcurement: React.FC = () => {
   }, []);
 
   const buildSteps = (p: Procurement): StepInfo[] => {
+    const isRejected = p.inspectionDecision === 'REJECTED' || p.status === 'REJECTED';
     const isArrived = p.status !== 'PENDING_INSPECTION' || (p as any).bookingStatus === 'ARRIVED';
-    const isInspected = p.status === 'INSPECTED' || p.status === 'APPROVED';
-    const isApproved = p.status === 'APPROVED';
-    const isProcessing = p.payment?.status === 'PROCESSING' || p.payment?.status === 'PAID';
-    const isPaid = p.payment?.status === 'PAID';
+    const isInspected = p.status === 'INSPECTED' || p.status === 'APPROVED' || isRejected;
+    const isApproved = p.status === 'APPROVED' && !isRejected;
+    const isProcessing = (p.payment?.status === 'PROCESSING' || p.payment?.status === 'PAID') && !isRejected;
+    const isPaid = p.payment?.status === 'PAID' && !isRejected;
+
+    if (isRejected) {
+      return [
+        { label: t('procurement.stepperRegistered'), status: 'completed', timestamp: 'Verified' },
+        { label: t('procurement.stepperBooked'), status: 'completed', timestamp: 'Token Issued' },
+        { label: t('procurement.stepperArrived'), status: 'completed', timestamp: 'At Centre' },
+        {
+          label: 'Inspection (Rejected)',
+          status: 'rejected',
+          timestamp: p.inspectedAt ? new Date(p.inspectedAt).toLocaleTimeString() : 'Rejected',
+        },
+      ];
+    }
 
     return [
       { label: t('procurement.stepperRegistered'), status: 'completed', timestamp: 'Verified' },
@@ -83,19 +105,19 @@ export const TrackProcurement: React.FC = () => {
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-slate-200 pb-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-line pb-4">
         <div>
           <div className="flex items-center gap-2">
-            <Layers className="w-6 h-6 text-navy-800" />
-            <h1 className="text-2xl font-bold text-navy-900">{t('procurement.title')}</h1>
+            <Layers className="w-6 h-6 text-india-green" />
+            <h1 className="text-2xl font-bold text-ink">{t('procurement.title')}</h1>
           </div>
-          <p className="text-xs text-slate-500">
-            End-to-end transparency from weighing to quality inspection & payment initiation
+          <p className="text-xs text-muted">
+            End-to-end transparency from physical weighing to quality inspection & payment initiation
           </p>
         </div>
 
-        <div className="flex items-center gap-2 text-xs text-slate-500 bg-slate-100 px-3 py-1.5 rounded-full border border-slate-200">
-          <RefreshCw className="w-3.5 h-3.5 animate-spin text-navy-800" />
+        <div className="flex items-center gap-2 text-xs text-muted bg-paper px-3 py-1.5 rounded border border-line">
+          <RefreshCw className="w-3.5 h-3.5 animate-spin text-ink" />
           <span>Last sync: {lastRefreshed || 'Syncing...'}</span>
         </div>
       </div>
@@ -104,115 +126,246 @@ export const TrackProcurement: React.FC = () => {
         <div className="space-y-6">
           {procurements.map((p) => {
             const steps = buildSteps(p);
+            const isRejected = p.inspectionDecision === 'REJECTED' || p.status === 'REJECTED';
+            const isPartial = p.inspectionDecision === 'PARTIALLY_ACCEPTED';
+            const isFull = p.inspectionDecision === 'FULLY_ACCEPTED' || (p.status === 'APPROVED' && !isPartial && !isRejected);
+
+            const expectedKg = p.expectedQuantityKg || (p.expectedQuantity ? p.expectedQuantity * 100 : 0);
+            const actualKg = p.actualReceivedQuantityKg ?? expectedKg;
+            const acceptedKg = p.acceptedQuantityKg ?? (p.acceptedQuantity ? p.acceptedQuantity * 100 : 0);
+            const rejectedKg = p.rejectedQuantityKg ?? Math.max(0, actualKg - acceptedKg);
+
             return (
               <div
                 key={p.id}
-                className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-6"
+                className="bg-white rounded p-6 border border-line shadow-sm space-y-6"
               >
                 {/* Header of Card */}
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-slate-100 pb-4">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-line pb-4">
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="text-xs font-mono font-bold bg-navy-100 text-navy-800 px-2 py-0.5 rounded">
+                      <span className="text-xs font-mono font-bold bg-green-50 text-india-green px-2 py-0.5 rounded">
                         Token: {p.tokenNumber}
                       </span>
-                      <span className="text-xs text-slate-500 font-mono">
+                      <span className="text-xs text-muted font-mono">
                         Ref: {p.bookingReference}
                       </span>
                     </div>
-                    <h3 className="text-lg font-bold text-navy-900 mt-1">
-                      {p.cropType} Procurement
+                    <h3 className="text-lg font-bold text-ink mt-1 flex items-center gap-2">
+                      <span>{p.cropType} Procurement</span>
+                      {p.centreName && (
+                        <span className="text-xs font-normal text-muted">
+                          • {p.centreName}
+                        </span>
+                      )}
                     </h3>
                   </div>
 
-                  <span
-                    className={`px-3 py-1 rounded-full text-xs font-bold ${
-                      p.status === 'APPROVED'
-                        ? 'bg-emerald-100 text-emerald-800'
-                        : p.status === 'INSPECTED'
-                        ? 'bg-blue-100 text-blue-800'
-                        : 'bg-amber-100 text-amber-800'
-                    }`}
-                  >
-                    Status: {p.status.replace('_', ' ')}
-                  </span>
+                  {/* Decision / Status Badge */}
+                  <div className="flex items-center gap-2">
+                    {isRejected ? (
+                      <span className="bg-red-100 text-red-800 px-3 py-1 rounded text-xs font-bold flex items-center gap-1 border border-red-200">
+                        <XCircle className="w-3.5 h-3.5" />
+                        <span>REJECTED</span>
+                      </span>
+                    ) : isPartial ? (
+                      <span className="bg-amber-100 text-amber-900 px-3 py-1 rounded text-xs font-bold flex items-center gap-1 border border-amber-200">
+                        <AlertTriangle className="w-3.5 h-3.5 text-amber-700" />
+                        <span>PARTIALLY ACCEPTED</span>
+                      </span>
+                    ) : p.status === 'APPROVED' ? (
+                      <span className="bg-green-100 text-green-800 px-3 py-1 rounded text-xs font-bold flex items-center gap-1 border border-green-200">
+                        <CheckCircle className="w-3.5 h-3.5" />
+                        <span>FULLY ACCEPTED</span>
+                      </span>
+                    ) : (
+                      <span className="bg-paper text-ink px-3 py-1 rounded text-xs font-bold border border-line">
+                        Status: {p.status.replace('_', ' ')}
+                      </span>
+                    )}
+
+                    {/* Receipt Button */}
+                    {(p.status === 'APPROVED' || isRejected || isPartial || p.inspectedAt) && (
+                      <button
+                        onClick={() => setSelectedReceiptProcurement(p)}
+                        className="bg-india-green hover:bg-green-700 text-white px-3.5 py-1.5 rounded text-xs font-bold flex items-center gap-1.5 shadow-sm transition"
+                        title="View & Print Official Receipt"
+                      >
+                        <FileText className="w-3.5 h-3.5 text-white" />
+                        <span>Receipt</span>
+                      </button>
+                    )}
+                  </div>
                 </div>
 
-                {/* Visual 7-Stage Stepper */}
-                <div className="bg-slate-50 rounded-xl p-4 border border-slate-200">
+                {/* Visual Stepper */}
+                <div className="bg-paper rounded p-4 border border-line">
                   <StatusStepper steps={steps} />
                 </div>
 
-                {/* Inspection & Pricing Metrics */}
+                {/* Rejection / Partial Alert Callout */}
+                {(isRejected || isPartial) && p.rejectionReason && (
+                  <div className={`p-4 rounded border flex items-start gap-3 text-xs ${
+                    isRejected
+                      ? 'bg-red-50 border-red-200 text-red-900'
+                      : 'bg-amber-50 border-amber-200 text-amber-900'
+                  }`}>
+                    {isRejected ? (
+                      <XCircle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
+                    ) : (
+                      <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+                    )}
+                    <div className="space-y-1">
+                      <div className="font-bold uppercase tracking-wider text-[11px]">
+                        {isRejected ? 'Inspection Rejection Notice' : 'Partial Acceptance Notice'}
+                      </div>
+                      <p className="font-semibold">
+                        Reason: {p.rejectionReason}
+                      </p>
+                      {p.officerRemarks && (
+                        <p className="text-[11px] opacity-85">
+                          Officer Remarks: "{p.officerRemarks}"
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Detailed Quantity & Inspection Grid */}
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-                  <div className="p-3 bg-slate-50 rounded-xl border border-slate-200">
-                    <span className="text-slate-500 block mb-1">Expected vs Accepted</span>
-                    <span className="font-bold text-slate-900 text-sm">
-                      {p.acceptedQuantity ? `${p.acceptedQuantity} Q` : 'Pending Weighing'}
+                  {/* Declared & Received */}
+                  <div className="p-3 bg-paper rounded border border-line">
+                    <span className="text-muted block mb-1">Declared vs Received</span>
+                    <span className="font-bold text-ink text-sm block">
+                      {p.actualReceivedQuantityKg !== undefined && p.actualReceivedQuantityKg !== null
+                        ? fromKilograms(actualKg, 'q').displayString
+                        : 'Awaiting Weighing'}
                     </span>
-                    <span className="text-[10px] text-slate-400 block">
-                      Initial: {p.expectedQuantity} Q
+                    <span className="text-[10px] text-muted block mt-0.5">
+                      Declared: {formatDualQuantity(expectedKg, p.originalQuantity, p.quantityUnit)}
                     </span>
                   </div>
 
-                  <div className="p-3 bg-slate-50 rounded-xl border border-slate-200">
-                    <span className="text-slate-500 block mb-1">Quality Assessment</span>
-                    <span className="font-bold text-navy-800 text-sm flex items-center gap-1">
-                      <Award className="w-3.5 h-3.5 text-amber-500" />
-                      <span>{p.qualityGrade || 'Awaiting Inspector'}</span>
+                  {/* Accepted & Rejected Quantity */}
+                  <div className={`p-3 rounded border ${
+                    isRejected
+                      ? 'bg-red-50 border-red-200'
+                      : isPartial
+                      ? 'bg-amber-50 border-amber-200'
+                      : 'bg-paper border-line'
+                  }`}>
+                    <span className="text-muted block mb-1">Accepted for MSP</span>
+                    <span className={`font-black text-sm block ${
+                      isRejected ? 'text-red-700' : 'text-green-700'
+                    }`}>
+                      {isRejected
+                        ? '0 kg (Rejected)'
+                        : p.acceptedQuantityKg !== undefined && p.acceptedQuantityKg !== null
+                        ? fromKilograms(acceptedKg, 'q').displayString
+                        : p.acceptedQuantity
+                        ? `${p.acceptedQuantity} Q`
+                        : 'Pending'}
                     </span>
-                    <span className="text-[10px] text-slate-400 block">Moisture & Purity</span>
+                    {rejectedKg > 0 && (
+                      <span className="text-[10px] text-red-600 font-semibold block mt-0.5">
+                        Returned: {fromKilograms(rejectedKg, 'q').displayString}
+                      </span>
+                    )}
                   </div>
 
-                  <div className="p-3 bg-slate-50 rounded-xl border border-slate-200">
-                    <span className="text-slate-500 block mb-1">Procurement Rate / Q</span>
-                    <span className="font-bold text-slate-900 text-sm">
-                      {p.ratePerQuintal ? `₹${p.ratePerQuintal.toLocaleString('en-IN')}` : 'MSP Linked'}
+                  {/* Quality Grade & Rate */}
+                  <div className="p-3 bg-paper rounded border border-line">
+                    <span className="text-muted block mb-1">Grade & MSP Rate</span>
+                    <span className="font-bold text-ink text-sm flex items-center gap-1">
+                      <Award className="w-3.5 h-3.5 text-india-saffron shrink-0" />
+                      <span>{p.qualityGrade || 'Pending Grade'}</span>
                     </span>
-                    <span className="text-[10px] text-slate-400 block">APMC Verified Rate</span>
+                    <span className="text-[10px] text-muted block mt-0.5">
+                      {p.ratePerQuintal && p.ratePerQuintal > 0
+                        ? `₹${p.ratePerQuintal.toLocaleString('en-IN')} / Q`
+                        : isRejected
+                        ? 'N/A'
+                        : 'MSP Linked'}
+                    </span>
                   </div>
 
-                  <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-200">
-                    <span className="text-emerald-800 font-bold block mb-1">Total Approved Amount</span>
-                    <span className="font-black text-emerald-900 text-base">
-                      {p.totalAmount ? `₹${p.totalAmount.toLocaleString('en-IN')}` : 'Calculating...'}
+                  {/* Total Approved Amount */}
+                  <div className={`p-3 rounded border ${
+                    isRejected
+                      ? 'bg-paper border-line opacity-60'
+                      : 'bg-green-50 border-green-200'
+                  }`}>
+                    <span className="text-green-800 font-bold block mb-1">Total Payout</span>
+                    <span className="font-black text-ink text-base block">
+                      {isRejected
+                        ? '₹0'
+                        : p.totalAmount
+                        ? `₹${p.totalAmount.toLocaleString('en-IN')}`
+                        : 'Calculating...'}
                     </span>
-                    <span className="text-[10px] text-emerald-700 block">
-                      {p.payment ? `Payment: ${p.payment.status}` : 'Pending approval'}
+                    <span className="text-[10px] text-green-700 block mt-0.5">
+                      {isRejected
+                        ? 'Procurement declined'
+                        : p.payment
+                        ? `Payment: ${p.payment.status}`
+                        : 'Pending approval'}
                     </span>
                   </div>
                 </div>
 
-                {/* Footer Link to Payment Tracker */}
-                {p.payment && (
-                  <div className="pt-2 flex justify-end">
-                    <Link
-                      to="/payment-status"
-                      className="text-xs font-bold text-navy-800 hover:underline flex items-center gap-1"
-                    >
-                      <span>View Direct Bank Deposit Status ({p.payment.status})</span>
-                      <CreditCard className="w-3.5 h-3.5" />
-                    </Link>
+                {/* Footer Actions */}
+                <div className="pt-2 flex flex-wrap justify-between items-center gap-2 border-t border-line text-xs">
+                  <div className="flex items-center gap-1.5 text-muted">
+                    <ShieldCheck className="w-4 h-4 text-india-green shrink-0" />
+                    <span>State Portal Verified Digital Record</span>
                   </div>
-                )}
+
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={() => setSelectedReceiptProcurement(p)}
+                      className="font-bold text-ink hover:text-gray-700 flex items-center gap-1"
+                    >
+                      <FileText className="w-3.5 h-3.5" />
+                      <span>View Receipt</span>
+                    </button>
+
+                    {p.payment && !isRejected && (
+                      <Link
+                        to="/payment-status"
+                        className="font-bold text-india-green hover:text-green-700 flex items-center gap-1"
+                      >
+                        <span>Direct Bank Deposit ({p.payment.status})</span>
+                        <ChevronRight className="w-3.5 h-3.5" />
+                      </Link>
+                    )}
+                  </div>
+                </div>
               </div>
             );
           })}
         </div>
       ) : (
-        <div className="bg-white rounded-2xl p-12 text-center space-y-4 border border-slate-200 shadow-sm">
-          <Layers className="w-12 h-12 text-slate-300 mx-auto" />
-          <h3 className="text-base font-bold text-slate-700">No Procurement Records Yet</h3>
-          <p className="text-xs text-slate-500 max-w-sm mx-auto">
-            Once you book a slot and check in at the procurement centre, live inspection and weighing metrics will appear here.
+        <div className="bg-white rounded p-12 text-center space-y-4 border border-line shadow-sm">
+          <Layers className="w-12 h-12 text-muted mx-auto" />
+          <h3 className="text-base font-bold text-ink">No Procurement Records Yet</h3>
+          <p className="text-xs text-muted max-w-sm mx-auto">
+            Once you book a slot and check in at the procurement centre, live inspection, weighing metrics, and digital receipts will appear here.
           </p>
           <Link
             to="/book-slot"
-            className="inline-flex bg-navy-800 text-white text-xs font-bold px-5 py-2.5 rounded-xl shadow"
+            className="inline-flex bg-india-green hover:bg-green-700 text-white text-xs font-bold px-5 py-2.5 rounded shadow"
           >
             Book Procurement Slot
           </Link>
         </div>
+      )}
+
+      {/* Digital Receipt Modal */}
+      {selectedReceiptProcurement && (
+        <DigitalReceiptModal
+          procurement={selectedReceiptProcurement}
+          onClose={() => setSelectedReceiptProcurement(null)}
+        />
       )}
     </div>
   );

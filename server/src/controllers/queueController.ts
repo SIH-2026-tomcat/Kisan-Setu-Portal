@@ -72,22 +72,29 @@ export async function getLiveQueue(req: Request, res: Response): Promise<void> {
     let advisoryNotice = 'Please check queue updates periodically.';
 
     if (tokenNumber && typeof tokenNumber === 'string') {
-      const myTokenNum = parseTokenNum(tokenNumber);
-      farmersAhead = Math.max(0, myTokenNum - currentServingNum);
-      estimatedWaitMinutes = farmersAhead * 4; // ~4 minutes per farmer
-
-      const now = new Date();
-      now.setMinutes(now.getMinutes() + estimatedWaitMinutes);
-      expectedTurnTime = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-      if (farmersAhead > 5) {
-        advisoryNotice = 'You can wait safely before travelling to the centre.';
-      } else if (farmersAhead >= 3) {
-        advisoryNotice = 'Your turn is approaching. Prepare your produce for transport.';
-      } else if (farmersAhead >= 1) {
-        advisoryNotice = 'Please proceed to the procurement centre.';
+      const myBooking = bookings.find((b) => b.tokenNumber === tokenNumber);
+      if (myBooking?.status === 'ON_HOLD') {
+        advisoryNotice = 'Your slot is on hold because you missed your scheduled reporting window. Please contact the procurement centre counter.';
+      } else if (myBooking?.status === 'CANCELLED') {
+        advisoryNotice = 'Your booking was cancelled because no remaining slot capacity was available today after your scheduled slot was missed.';
       } else {
-        advisoryNotice = 'Please report to the procurement counter immediately.';
+        const myTokenNum = parseTokenNum(tokenNumber);
+        farmersAhead = Math.max(0, myTokenNum - currentServingNum);
+        estimatedWaitMinutes = farmersAhead * 4; // ~4 minutes per farmer
+
+        const now = new Date();
+        now.setMinutes(now.getMinutes() + estimatedWaitMinutes);
+        expectedTurnTime = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+        if (farmersAhead > 5) {
+          advisoryNotice = 'You can wait safely before travelling to the centre.';
+        } else if (farmersAhead >= 3) {
+          advisoryNotice = 'Your turn is approaching. Prepare your produce for transport.';
+        } else if (farmersAhead >= 1) {
+          advisoryNotice = 'Please proceed to the procurement centre.';
+        } else {
+          advisoryNotice = 'Please report to the procurement counter immediately.';
+        }
       }
     }
 
@@ -95,7 +102,13 @@ export async function getLiveQueue(req: Request, res: Response): Promise<void> {
     const queueList = bookings.map((b) => {
       const bNum = parseTokenNum(b.tokenNumber);
       let statusLabel = 'Waiting';
-      if (b.tokenNumber === currentlyServing) {
+      if (b.status === 'ON_HOLD') {
+        statusLabel = 'On Hold';
+      } else if (b.status === 'CANCELLED') {
+        statusLabel = 'Cancelled';
+      } else if (b.status === 'REASSIGNED') {
+        statusLabel = 'Reassigned';
+      } else if (b.tokenNumber === currentlyServing) {
         statusLabel = 'Serving';
       } else if (bNum < currentServingNum || b.status === 'COMPLETED') {
         statusLabel = 'Completed';
@@ -105,9 +118,11 @@ export async function getLiveQueue(req: Request, res: Response): Promise<void> {
 
       return {
         tokenNumber: b.tokenNumber,
+        originalTokenNumber: b.originalTokenNumber,
         farmerName: b.farmer?.fullName || 'Farmer',
         cropType: b.cropType,
         quantity: b.expectedQuantity,
+        quantityUnit: b.quantityUnit,
         timeSlot: b.slot ? `${b.slot.startTime}–${b.slot.endTime}` : '09:00–10:00',
         status: statusLabel,
         isCurrentlyServing: b.tokenNumber === currentlyServing,
@@ -121,6 +136,11 @@ export async function getLiveQueue(req: Request, res: Response): Promise<void> {
         name: centre.name,
         district: centre.district,
         address: centre.address,
+        latitude: centre.latitude,
+        longitude: centre.longitude,
+        phoneNumber: centre.phoneNumber,
+        contactOfficerName: centre.contactOfficerName || null,
+        contactOfficerNumber: centre.contactOfficerNumber || null,
       },
       date: targetDate,
       currentlyServing,

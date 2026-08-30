@@ -1,9 +1,8 @@
-import React from 'react';
-import { Check } from 'lucide-react';
+import { Check, X as XIcon } from 'lucide-react';
 
 export interface StepInfo {
   label: string;
-  status: 'completed' | 'current' | 'pending';
+  status: 'completed' | 'current' | 'pending' | 'rejected';
   timestamp?: string | null;
   detail?: string | null;
 }
@@ -24,12 +23,20 @@ export const StatusStepper: React.FC<StatusStepperProps> = ({ steps }) => {
               className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0 z-10 ${
                 step.status === 'completed'
                   ? 'bg-emerald-600 text-white'
+                  : step.status === 'rejected'
+                  ? 'bg-red-600 text-white ring-4 ring-red-100'
                   : step.status === 'current'
                   ? 'bg-navy-800 text-white ring-4 ring-navy-100'
                   : 'bg-slate-200 text-slate-500 border border-slate-300'
               }`}
             >
-              {step.status === 'completed' ? <Check className="w-4 h-4" /> : idx + 1}
+              {step.status === 'completed' ? (
+                <Check className="w-4 h-4" />
+              ) : step.status === 'rejected' ? (
+                <XIcon className="w-4 h-4" />
+              ) : (
+                idx + 1
+              )}
             </div>
 
             {/* Connecting line */}
@@ -46,6 +53,8 @@ export const StatusStepper: React.FC<StatusStepperProps> = ({ steps }) => {
                 className={`text-sm font-semibold leading-tight ${
                   step.status === 'completed'
                     ? 'text-emerald-800'
+                    : step.status === 'rejected'
+                    ? 'text-red-700 font-bold'
                     : step.status === 'current'
                     ? 'text-navy-900 font-bold'
                     : 'text-slate-500'
@@ -71,17 +80,27 @@ export const StatusStepper: React.FC<StatusStepperProps> = ({ steps }) => {
               className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition shadow-sm ${
                 step.status === 'completed'
                   ? 'bg-emerald-600 text-white ring-4 ring-emerald-50'
+                  : step.status === 'rejected'
+                  ? 'bg-red-600 text-white ring-4 ring-red-100'
                   : step.status === 'current'
                   ? 'bg-navy-800 text-white ring-4 ring-navy-100'
                   : 'bg-white text-slate-400 border-2 border-slate-300'
               }`}
             >
-              {step.status === 'completed' ? <Check className="w-4 h-4" /> : idx + 1}
+              {step.status === 'completed' ? (
+                <Check className="w-4 h-4" />
+              ) : step.status === 'rejected' ? (
+                <XIcon className="w-4 h-4" />
+              ) : (
+                idx + 1
+              )}
             </div>
             <span
               className={`text-xs font-semibold mt-2 max-w-[90px] leading-tight ${
                 step.status === 'completed'
                   ? 'text-emerald-800 font-bold'
+                  : step.status === 'rejected'
+                  ? 'text-red-700 font-black'
                   : step.status === 'current'
                   ? 'text-navy-900 font-black'
                   : 'text-slate-400'

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { api } from '../services/api';
@@ -13,6 +14,7 @@ import {
 } from 'lucide-react';
 
 export const OfficerPayments: React.FC = () => {
+  const { t } = useTranslation();
   const { officer } = useAuth();
   const { showSuccess, showError, showSMS } = useToast();
 
@@ -24,7 +26,6 @@ export const OfficerPayments: React.FC = () => {
     try {
       const res = await api.getOfficerQueue();
       if (res.success && res.queue) {
-        // Filter items with procurement
         setQueueItems(res.queue);
         setLastRefreshed(new Date().toLocaleTimeString());
       }
@@ -63,10 +64,10 @@ export const OfficerPayments: React.FC = () => {
         <div>
           <div className="flex items-center gap-2">
             <CreditCard className="w-6 h-6 text-emerald-600" />
-            <h1 className="text-2xl font-bold text-navy-900">Direct Payment Clearance Desk</h1>
+            <h1 className="text-2xl font-bold text-navy-900">{t('officer.paymentsDesk')}</h1>
           </div>
           <p className="text-xs text-slate-500">
-            Authorize state-gate payment transactions (Pending → Processing → Paid)
+            {t('officer.paymentsDesc')}
           </p>
         </div>
 
@@ -75,27 +76,27 @@ export const OfficerPayments: React.FC = () => {
           className="flex items-center gap-1.5 text-xs text-navy-800 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-lg font-semibold"
         >
           <RefreshCw className="w-3.5 h-3.5" />
-          <span>Refresh Records</span>
+          <span>{t('officer.refreshRecords')}</span>
         </button>
       </div>
 
       {/* Table of Approved Procurements & Payments */}
       <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-4">
         <h3 className="text-base font-bold text-navy-900 border-b border-slate-100 pb-3">
-          Procurement Payout Transactions
+          {t('officer.payoutTxns')}
         </h3>
 
         <div className="overflow-x-auto">
           <table className="w-full text-xs text-left text-slate-700">
             <thead className="bg-slate-100 text-slate-800 uppercase font-bold border-b border-slate-200">
               <tr>
-                <th className="px-4 py-3">Token</th>
-                <th className="px-4 py-3">Farmer</th>
-                <th className="px-4 py-3">Produce & Grade</th>
+                <th className="px-4 py-3">{t('officer.token')}</th>
+                <th className="px-4 py-3">{t('officer.farmerDetails')}</th>
+                <th className="px-4 py-3">{t('officer.produceQty')} & Grade</th>
                 <th className="px-4 py-3">Approved Total</th>
-                <th className="px-4 py-3">Payment Status</th>
-                <th className="px-4 py-3">Transaction Ref</th>
-                <th className="px-4 py-3 text-right">Action</th>
+                <th className="px-4 py-3">{t('payment.title')}</th>
+                <th className="px-4 py-3">{t('payment.txnRef')}</th>
+                <th className="px-4 py-3 text-right">{t('officer.actions')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-200">
@@ -150,7 +151,7 @@ export const OfficerPayments: React.FC = () => {
                             disabled={loading}
                             className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg font-bold text-[11px] shadow-sm transition"
                           >
-                            Send to PFMS / Bank
+                            {t('officer.sendToBank')}
                           </button>
                         )}
                         {isProcessing && (
@@ -159,13 +160,13 @@ export const OfficerPayments: React.FC = () => {
                             disabled={loading}
                             className="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg font-bold text-[11px] shadow-sm transition"
                           >
-                            Mark Complete (Paid)
+                            {t('officer.markPaid')}
                           </button>
                         )}
                         {isPaid && (
                           <span className="text-emerald-700 font-bold text-[11px] inline-flex items-center gap-1">
                             <CheckCircle className="w-3.5 h-3.5" />
-                            <span>Settled</span>
+                            <span>{t('officer.settled')}</span>
                           </span>
                         )}
                       </td>

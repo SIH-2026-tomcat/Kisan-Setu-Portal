@@ -1,6 +1,7 @@
 import { Response } from 'express';
 import { prisma } from '../config/db';
 import { AuthenticatedRequest } from '../middleware/auth';
+import { processFarmerMessage } from '../services/assistantService';
 
 /**
  * Get all procurement trackings for the logged-in farmer
@@ -176,5 +177,40 @@ export async function markNotificationRead(req: AuthenticatedRequest, res: Respo
   } catch (error) {
     console.error('markNotificationRead error:', error);
     res.status(500).json({ success: false, message: 'Failed to update notification.' });
+  }
+}
+
+/**
+ * Handle Kisan Mitra Chatbot assistant message for authenticated farmer
+ */
+export async function handleAssistantMessage(req: AuthenticatedRequest, res: Response): Promise<void> {
+  try {
+    const farmerId = req.user?.id;
+    if (!farmerId) {
+      res.status(401).json({ success: false, message: 'Unauthorized. Authenticated farmer session required.' });
+      return;
+    }
+
+    const { message, language } = req.body;
+    if (!message || typeof message !== 'string' || message.trim().length === 0) {
+      res.status(400).json({ success: false, message: 'Message text is required.' });
+      return;
+    }
+
+    if (message.length > 500) {
+      res.status(400).json({ success: false, message: 'Message length exceeds maximum 500 character limit.' });
+      return;
+    }
+
+    const lang = (language === 'hi' || language === 'te') ? language : 'en';
+    const responseData = await processFarmerMessage(farmerId, message.trim(), lang);
+
+    res.status(200).json({
+      success: true,
+      ...responseData,
+    });
+  } catch (error) {
+    console.error('handleAssistantMessage error:', error);
+    res.status(500).json({ success: false, message: 'Kisan Mitra is temporarily unavailable. Please try again.' });
   }
 }

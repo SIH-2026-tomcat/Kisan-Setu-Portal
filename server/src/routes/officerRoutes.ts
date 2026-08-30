@@ -4,6 +4,10 @@ import {
   getOfficerQueue,
   callNextFarmer,
   markFarmerArrived,
+  holdBooking,
+  getReassignmentSlots,
+  reassignBooking,
+  cancelMissedBooking,
   processProcurement,
   updatePaymentStatus,
   getAuditLogs,
@@ -20,6 +24,10 @@ router.get('/dashboard', getOfficerDashboard);
 router.get('/queue', getOfficerQueue);
 router.post('/queue/next', callNextFarmer);
 router.post('/mark-arrived', markFarmerArrived);
+router.post('/bookings/:bookingId/hold', holdBooking);
+router.get('/bookings/:bookingId/reassignment-slots', getReassignmentSlots);
+router.post('/bookings/:bookingId/reassign', reassignBooking);
+router.post('/bookings/:bookingId/cancel-missed', cancelMissedBooking);
 router.patch('/procurement/:procurementId/status', processProcurement);
 router.patch('/payments/:paymentId/status', updatePaymentStatus);
 router.get('/audit', getAuditLogs);

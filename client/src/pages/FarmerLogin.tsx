@@ -95,147 +95,168 @@ export const FarmerLogin: React.FC = () => {
   };
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center px-4 py-12">
-      <div className="max-w-md w-full bg-white rounded-2xl shadow-xl border border-slate-200 p-6 sm:p-8 space-y-6">
-        {/* Header */}
-        <div className="text-center space-y-2">
-          <div className="inline-flex p-3 rounded-full bg-navy-50 text-navy-800 border border-navy-100">
-            <Wheat className="w-8 h-8" />
-          </div>
-          <h2 className="text-2xl font-bold text-navy-900">{t('auth.farmerLoginTitle')}</h2>
-          <p className="text-xs text-slate-500">
-            Secure OTP-based authentication for farmers and producers
-          </p>
-        </div>
-
-        {/* Error Alert */}
-        {errorMessage && (
-          <div className="p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-xs text-red-700">
-            <AlertCircle className="w-4 h-4 shrink-0" />
-            <span>{errorMessage}</span>
-          </div>
-        )}
-
-        {/* Demo Fast Login Banner */}
-        <div className="bg-amber-50 border border-amber-200 rounded-xl p-3.5 space-y-2">
-          <div className="flex items-center justify-between text-xs">
-            <span className="font-bold text-amber-900">⚡ Smart India Hackathon Demo</span>
-            <span className="bg-amber-200 text-amber-900 text-[10px] px-2 py-0.5 rounded font-mono font-bold">
-              1-CLICK
+    <div className="min-h-[85vh] flex items-center justify-center px-4 py-8 sm:py-12">
+      <div className="max-w-4xl w-full bg-white rounded-2xl shadow-xl border border-line overflow-hidden grid grid-cols-1 md:grid-cols-2">
+        {/* Left Side: Photography Banner */}
+        <div className="relative h-48 md:h-auto bg-india-green_deep">
+          <img
+            src="/images/farmer_login_side.jpg"
+            alt="Indian Farmer in field"
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-india-green_deep/90 via-india-green_deep/30 to-black/30 flex flex-col justify-end p-6 text-white space-y-1">
+            <span className="text-[10px] bg-india-saffron text-white font-bold px-2 py-0.5 rounded w-fit uppercase tracking-wider">
+              Smart MSP Portal
             </span>
+            <h3 className="text-xl font-bold tracking-tight">Kisan Setu Portal</h3>
+            <p className="text-xs text-green-100 opacity-90 leading-tight">
+              Direct and transparent digital procurement system for farmers.
+            </p>
           </div>
-          <p className="text-[11px] text-amber-800 leading-tight">
-            Use predefined demo farmer profile (Ramesh Kumar, Paddy 25 Q, Token A-042).
-          </p>
-          <button
-            type="button"
-            onClick={handleQuickDemoLogin}
-            disabled={loading}
-            className="w-full bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold py-2 rounded-lg transition shadow flex items-center justify-center gap-1.5"
-          >
-            <UserCheck className="w-4 h-4" />
-            <span>{t('auth.quickDemoLogin')}</span>
-          </button>
         </div>
 
-        {/* OTP Form */}
-        {!otpSent ? (
-          <form onSubmit={handleRequestOTP} className="space-y-4">
-            <div className="space-y-1.5">
-              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
-                {t('auth.enterMobile')}
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                  <Phone className="w-4 h-4" />
-                  <span className="ml-1 text-xs font-semibold text-slate-500 border-r border-slate-300 pr-2">
-                    +91
-                  </span>
-                </div>
-                <input
-                  type="tel"
-                  maxLength={10}
-                  value={mobileNumber}
-                  onChange={(e) => setMobileNumber(e.target.value.replace(/\D/g, ''))}
-                  placeholder="9876543210"
-                  className="w-full pl-16 pr-3 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm font-medium focus:bg-white focus:border-navy-800 transition"
-                  required
-                />
-              </div>
-              <span className="text-[11px] text-slate-400 block">
-                {t('auth.demoOtpNotice')} (Works for any 10-digit number)
+        {/* Right Side: Form Content */}
+        <div className="p-6 sm:p-8 space-y-6 flex flex-col justify-center bg-white">
+          {/* Header */}
+          <div className="text-center space-y-2">
+            <div className="inline-flex p-2.5 rounded-full bg-green-50 text-india-green border border-line">
+              <Wheat className="w-6 h-6" />
+            </div>
+            <h2 className="text-xl font-bold text-ink">{t('auth.farmerLoginTitle', 'Farmer Login')}</h2>
+            <p className="text-xs text-muted">
+              Secure OTP-based authentication for farmers and producers
+            </p>
+          </div>
+
+          {/* Error Alert */}
+          {errorMessage && (
+            <div className="p-3 bg-red-50 border border-red-200 rounded-xl flex items-center gap-2 text-xs text-red-700">
+              <AlertCircle className="w-4 h-4 shrink-0" />
+              <span>{errorMessage}</span>
+            </div>
+          )}
+
+          {/* Demo Fast Login Banner */}
+          <div className="bg-amber-50 border border-amber-200 rounded-xl p-3.5 space-y-2">
+            <div className="flex items-center justify-between text-xs">
+              <span className="font-bold text-amber-900">⚡ SIH Demo OTP Bypass</span>
+              <span className="bg-amber-200 text-amber-900 text-[10px] px-2 py-0.5 rounded font-mono font-bold">
+                1-CLICK
               </span>
             </div>
-
-            <button
-              type="submit"
-              disabled={loading || mobileNumber.length < 10}
-              className="w-full bg-navy-800 hover:bg-navy-900 disabled:bg-slate-300 text-white font-bold py-3 rounded-xl text-sm shadow transition flex items-center justify-center gap-2"
-            >
-              <span>{loading ? 'Sending OTP...' : t('auth.sendOtp')}</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
-          </form>
-        ) : (
-          <form onSubmit={handleVerifyOTP} className="space-y-4">
-            <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-2.5 text-xs text-emerald-800 flex items-center justify-between">
-              <span>{t('auth.otpSentMsg')}</span>
-              <span className="font-bold font-mono">123456</span>
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
-                {t('auth.enterOtp')}
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                  <KeyRound className="w-4 h-4" />
-                </div>
-                <input
-                  type="text"
-                  maxLength={6}
-                  value={otp}
-                  onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
-                  placeholder="123456"
-                  className="w-full pl-10 pr-3 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-center text-lg font-mono font-bold tracking-widest focus:bg-white focus:border-navy-800 transition"
-                  required
-                />
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading || otp.length !== 6}
-              className="w-full bg-agri-700 hover:bg-agri-800 disabled:bg-slate-300 text-white font-bold py-3 rounded-xl text-sm shadow transition flex items-center justify-center gap-2"
-            >
-              <ShieldCheck className="w-4 h-4" />
-              <span>{loading ? 'Verifying...' : t('auth.loginSecurely')}</span>
-            </button>
-
+            <p className="text-[11px] text-amber-800 leading-tight">
+              Skip typing. Quick access as Demo Farmer: **Ramesh Kumar**.
+            </p>
             <button
               type="button"
-              onClick={() => setOtpSent(false)}
-              className="w-full text-center text-xs text-slate-500 hover:text-navy-800 underline py-1"
+              onClick={handleQuickDemoLogin}
+              disabled={loading}
+              className="w-full bg-india-saffron hover:bg-india-saffron_hover text-white text-xs font-bold py-2.5 rounded-xl transition shadow flex items-center justify-center gap-1.5 active:scale-[0.98]"
             >
-              Change Mobile Number
+              <UserCheck className="w-4 h-4" />
+              <span>{t('auth.quickDemoLogin', '1-Click Demo Login')}</span>
             </button>
-          </form>
-        )}
+          </div>
 
-        {/* Footer Link */}
-        <div className="pt-4 border-t border-slate-100 text-center space-y-2">
-          <Link
-            to="/register"
-            className="text-xs font-semibold text-navy-800 hover:underline block"
-          >
-            {t('auth.notRegistered')}
-          </Link>
-          <Link
-            to="/officer/login"
-            className="text-[11px] text-slate-400 hover:text-slate-600 block"
-          >
-            Procurement Officer Portal Login →
-          </Link>
+          {/* OTP Form */}
+          {!otpSent ? (
+            <form onSubmit={handleRequestOTP} className="space-y-4">
+              <div className="space-y-1.5">
+                <label className="block text-xs font-bold text-ink uppercase tracking-wider">
+                  {t('auth.enterMobile', 'Mobile Number')} *
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted">
+                    <Phone className="w-4 h-4" />
+                    <span className="ml-1 text-xs font-semibold text-muted border-r border-line pr-2">
+                      +91
+                    </span>
+                  </div>
+                  <input
+                    type="tel"
+                    maxLength={10}
+                    value={mobileNumber}
+                    onChange={(e) => setMobileNumber(e.target.value.replace(/\D/g, ''))}
+                    placeholder="9876543210"
+                    className="w-full pl-16 pr-3.5 py-2.5 bg-paper border border-line rounded-xl text-sm font-semibold focus:bg-white focus:border-india-green transition focus:outline-none"
+                    required
+                  />
+                </div>
+                <span className="text-[11px] text-muted block">
+                  {t('auth.demoOtpNotice', 'A demo OTP (123456) will be generated for testing.')}
+                </span>
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading || mobileNumber.length < 10}
+                className="w-full bg-india-green hover:bg-green-700 disabled:bg-slate-300 text-white font-bold py-3 rounded-xl text-sm shadow transition flex items-center justify-center gap-2 active:scale-[0.98]"
+              >
+                <span>{loading ? 'Sending OTP...' : t('auth.sendOtp', 'Send OTP')}</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </form>
+          ) : (
+            <form onSubmit={handleVerifyOTP} className="space-y-4">
+              <div className="bg-green-50 border border-line rounded-xl p-2.5 text-xs text-india-green flex items-center justify-between font-medium">
+                <span>{t('auth.otpSentMsg', 'Demo OTP Sent:')}</span>
+                <span className="font-bold font-mono bg-white px-2 py-0.5 rounded border border-line">123456</span>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="block text-xs font-bold text-ink uppercase tracking-wider">
+                  {t('auth.enterOtp', 'Enter 6-digit OTP')} *
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted">
+                    <KeyRound className="w-4 h-4" />
+                  </div>
+                  <input
+                    type="text"
+                    maxLength={6}
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
+                    placeholder="123456"
+                    className="w-full pl-10 pr-3.5 py-2.5 bg-paper border border-line rounded-xl text-center text-lg font-mono font-bold tracking-widest focus:bg-white focus:border-india-green transition focus:outline-none"
+                    required
+                  />
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading || otp.length !== 6}
+                className="w-full bg-india-green hover:bg-green-700 disabled:bg-slate-300 text-white font-bold py-3 rounded-xl text-sm shadow transition flex items-center justify-center gap-2 active:scale-[0.98]"
+              >
+                <ShieldCheck className="w-4 h-4" />
+                <span>{loading ? 'Verifying...' : t('auth.loginSecurely', 'Verify & Login')}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setOtpSent(false)}
+                className="w-full text-center text-xs text-muted hover:text-india-green hover:underline py-1"
+              >
+                Change Mobile Number
+              </button>
+            </form>
+          )}
+
+          {/* Footer Link */}
+          <div className="pt-4 border-t border-line text-center space-y-2">
+            <Link
+              to="/register"
+              className="text-xs font-bold text-india-green hover:underline block"
+            >
+              {t('auth.notRegistered', 'New Farmer? Register Profile')}
+            </Link>
+            <Link
+              to="/officer/login"
+              className="text-[11px] text-muted hover:text-ink block font-medium"
+            >
+              Procurement Officer Portal Login →
+            </Link>
+          </div>
         </div>
       </div>
     </div>

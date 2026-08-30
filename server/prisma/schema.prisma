@@ -48,21 +48,26 @@ model Officer {
 }
 
 model ProcurementCentre {
-  id          String      @id @default(uuid())
-  name        String
-  district    String
-  state       String
-  address     String
-  openingTime String      @default("09:00")
-  closingTime String      @default("17:00")
-  active      Boolean     @default(true)
-  slots       Slot[]
-  bookings    Booking[]
-  officers    Officer[]
-  farmers     Farmer[]
-  queues      Queue[]
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+  id                    String      @id @default(uuid())
+  name                  String
+  district              String
+  state                 String
+  address               String
+  latitude              Float?
+  longitude             Float?
+  phoneNumber           String?
+  contactOfficerName    String?     // Farmer-visible: assigned contact officer name
+  contactOfficerNumber  String?     // Farmer-visible: centre/officer contact phone number
+  openingTime           String      @default("09:00")
+  closingTime           String      @default("17:00")
+  active                Boolean     @default(true)
+  slots                 Slot[]
+  bookings              Booking[]
+  officers              Officer[]
+  farmers               Farmer[]
+  queues                Queue[]
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
 
   @@index([district])
 }
@@ -85,21 +90,31 @@ model Slot {
 }
 
 model Booking {
-  id               String            @id @default(uuid())
-  farmerId         String
-  farmer           Farmer            @relation(fields: [farmerId], references: [id])
-  centreId         String
-  centre           ProcurementCentre @relation(fields: [centreId], references: [id])
-  slotId           String
-  slot             Slot              @relation(fields: [slotId], references: [id])
-  bookingReference String            @unique // e.g. KS-26032-1847
-  tokenNumber      String            // e.g. A-042
-  cropType         String            // Paddy, Wheat, Maize, Groundnut, Cotton, Onion
-  expectedQuantity Float             // in Quintals
-  status           String            @default("BOOKED") // BOOKED, ARRIVED, INSPECTED, COMPLETED, CANCELLED
-  procurement      Procurement?
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
+  id                 String            @id @default(uuid())
+  farmerId           String
+  farmer             Farmer            @relation(fields: [farmerId], references: [id])
+  centreId           String
+  centre             ProcurementCentre @relation(fields: [centreId], references: [id])
+  slotId             String
+  slot               Slot              @relation(fields: [slotId], references: [id])
+  bookingReference   String            @unique // e.g. KS-26032-1847
+  tokenNumber        String            // e.g. A-042
+  cropType           String            // Paddy, Wheat, Maize, Groundnut, Cotton, Onion
+  expectedQuantity   Float             // in Quintals (kept for backward compatibility)
+  quantityUnit       String            @default("q") // "kg" or "q"
+  originalQuantity   Float             @default(0) // Quantity entered by farmer
+  expectedQuantityKg Float             @default(0) // Normalized quantity in Kilograms
+  status             String            @default("BOOKED") // BOOKED, ARRIVED, ON_HOLD, REASSIGNED, INSPECTED, COMPLETED, CANCELLED, REJECTED
+  originalSlotId     String?
+  originalTokenNumber String?
+  heldAt             DateTime?
+  reassignedAt       DateTime?
+  cancelledAt        DateTime?
+  cancellationReason String?           // e.g. MISSED_SLOT_NO_CAPACITY
+  cancelledByOfficerId String?
+  procurement        Procurement?
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
 
   @@index([centreId, slotId])
   @@index([farmerId])
@@ -119,23 +134,32 @@ model Queue {
 }
 
 model Procurement {
-  id               String            @id @default(uuid())
-  bookingId        String            @unique
-  booking          Booking           @relation(fields: [bookingId], references: [id])
-  farmerId         String
-  farmer           Farmer            @relation(fields: [farmerId], references: [id])
-  cropType         String
-  expectedQuantity Float
-  acceptedQuantity Float?
-  qualityGrade     String?           // Grade A, Grade B, Grade C
-  ratePerQuintal   Float?
-  totalAmount      Float?
-  status           String            @default("PENDING_INSPECTION") // PENDING_INSPECTION, INSPECTED, APPROVED, REJECTED
-  inspectedAt      DateTime?
-  approvedAt       DateTime?
-  payment          Payment?
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
+  id                       String            @id @default(uuid())
+  bookingId                String            @unique
+  booking                  Booking           @relation(fields: [bookingId], references: [id])
+  farmerId                 String
+  farmer                   Farmer            @relation(fields: [farmerId], references: [id])
+  cropType                 String
+  expectedQuantity         Float             // in Quintals (kept for backward compatibility)
+  quantityUnit             String?           // "kg" or "q"
+  originalQuantity         Float?
+  expectedQuantityKg       Float             @default(0)
+  actualReceivedQuantityKg Float?
+  acceptedQuantityKg       Float?
+  rejectedQuantityKg       Float?
+  acceptedQuantity         Float?            // in Quintals (kept for backward compatibility)
+  qualityGrade             String?           // Grade A, Grade B, Grade C, Below Standard
+  inspectionDecision       String?           // FULLY_ACCEPTED, PARTIALLY_ACCEPTED, REJECTED
+  rejectionReason          String?
+  officerRemarks           String?
+  ratePerQuintal           Float?
+  totalAmount              Float?
+  status                   String            @default("PENDING_INSPECTION") // PENDING_INSPECTION, INSPECTED, APPROVED, REJECTED
+  inspectedAt              DateTime?
+  approvedAt               DateTime?
+  payment                  Payment?
+  createdAt                DateTime          @default(now())
+  updatedAt                DateTime          @updatedAt
 
   @@index([farmerId])
   @@index([status])

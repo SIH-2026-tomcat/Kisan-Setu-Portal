@@ -7,16 +7,14 @@ import {
   Activity,
   Layers,
   CreditCard,
-  Bell,
   MapPin,
-  Clock,
-  ShieldCheck,
-  ChevronRight,
   Sparkles,
   ArrowRight,
   CheckCircle2,
   Users,
 } from 'lucide-react';
+import { TricolorStrip } from '../components/design/TricolorStrip';
+import { AshokaChakraSVG } from '../components/design/AshokaChakraSVG';
 
 export const Home: React.FC = () => {
   const { t } = useTranslation();
@@ -28,42 +26,36 @@ export const Home: React.FC = () => {
       desc: t('home.service1Desc'),
       icon: Calendar,
       link: '/book-slot',
-      color: 'bg-blue-50 text-navy-800 border-blue-200',
     },
     {
       title: t('home.service2Title'),
       desc: t('home.service2Desc'),
       icon: Activity,
       link: '/live-queue',
-      color: 'bg-emerald-50 text-emerald-800 border-emerald-200',
     },
     {
       title: t('home.service3Title'),
       desc: t('home.service3Desc'),
       icon: Sparkles,
       link: '/book-slot',
-      color: 'bg-amber-50 text-amber-800 border-amber-200',
     },
     {
       title: t('home.service5Title'),
       desc: t('home.service5Desc'),
       icon: Layers,
       link: '/track-procurement',
-      color: 'bg-purple-50 text-purple-800 border-purple-200',
     },
     {
       title: t('home.service6Title'),
       desc: t('home.service6Desc'),
       icon: CreditCard,
       link: '/payment-status',
-      color: 'bg-teal-50 text-teal-800 border-teal-200',
     },
     {
       title: 'Find Procurement Centres',
       desc: 'Locate APMC & Agricultural Procurement Centres with operating hours and active queues.',
       icon: MapPin,
       link: '/book-slot',
-      color: 'bg-slate-50 text-slate-800 border-slate-200',
     },
   ];
 
@@ -77,144 +69,142 @@ export const Home: React.FC = () => {
   ];
 
   return (
-    <div className="space-y-12 pb-16">
-      {/* Hero Section (Public-Service Trustworthy Theme) */}
-      <section className="bg-navy-800 text-white py-12 sm:py-16 px-4 sm:px-6 lg:px-8 shadow-inner border-b border-navy-900">
-        <div className="max-w-5xl mx-auto text-center space-y-6">
-          <div className="inline-flex items-center gap-2 bg-navy-700/80 border border-navy-600 px-3.5 py-1 rounded-full text-xs font-semibold text-amber-300">
-            <ShieldCheck className="w-4 h-4" />
-            <span>Digital Agricultural Procurement & Queue Management</span>
-          </div>
+    <div className="flex-1">
+      {/* Hero Section */}
+      <section 
+        className="relative overflow-hidden text-white bg-cover bg-center"
+        style={{ 
+          backgroundImage: 'linear-gradient(to right, rgba(21, 128, 61, 0.95) 0%, rgba(21, 128, 61, 0.7) 50%, rgba(21, 128, 61, 0.4) 100%), url("/images/farm_banner.jpg")',
+          backgroundBlendMode: 'normal'
+        }}
+      >
+        <AshokaChakraSVG className="pointer-events-none absolute -right-20 -top-20 h-72 w-72 text-white/20" />
+        
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 relative z-10">
+          <div className="max-w-2xl">
+            <p className="text-sm uppercase tracking-wide text-india-saffron_hover font-semibold">
+              Government of India
+            </p>
+            <h1 className="mt-2 text-3xl font-bold text-white sm:text-5xl leading-tight">
+              {t('brand.name', 'Kisan Setu Portal')}
+            </h1>
+            <p className="mt-3 text-lg sm:text-xl text-green-50 font-medium">
+              {t('home.heroTitle', 'Know your centre. Book your slot. Come when it is your turn.')}
+            </p>
+            <p className="mt-2 text-sm text-green-100 max-w-reading">
+              {t('home.heroDesc', 'An initiative of the Department of Consumer Affairs to make procurement scheduling predictable for every farmer.')}
+            </p>
 
-          <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight leading-tight">
-            {t('home.heroTitle')}
-          </h1>
-
-          <p className="text-base sm:text-lg text-slate-200 max-w-3xl mx-auto leading-relaxed">
-            {t('home.heroDesc')}
-          </p>
-
-          <div className="flex flex-wrap justify-center gap-3 sm:gap-4 pt-2">
-            <Link
-              to="/book-slot"
-              className="bg-agri-700 hover:bg-agri-800 text-white font-bold px-6 py-3.5 rounded-xl shadow-lg hover:shadow-xl transition flex items-center gap-2 text-sm sm:text-base"
-            >
-              <Calendar className="w-5 h-5" />
-              <span>{t('home.btnBook')}</span>
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-
-            <Link
-              to="/track-procurement"
-              className="bg-white/10 hover:bg-white/20 text-white font-semibold px-6 py-3.5 rounded-xl border border-white/20 transition flex items-center gap-2 text-sm sm:text-base backdrop-blur-sm"
-            >
-              <Layers className="w-5 h-5 text-amber-300" />
-              <span>{t('home.btnTrack')}</span>
-            </Link>
-
-            {role !== 'FARMER' && (
+            <div className="mt-6 flex flex-wrap gap-3">
               <Link
-                to="/login"
-                className="bg-navy-900 hover:bg-slate-950 text-slate-200 font-semibold px-5 py-3.5 rounded-xl border border-navy-700 transition flex items-center gap-2 text-sm sm:text-base"
+                to="/book-slot"
+                className="bg-india-saffron hover:bg-india-saffron_hover text-white font-semibold px-5 py-2.5 rounded shadow transition flex items-center gap-2"
               >
-                <Users className="w-5 h-5 text-slate-400" />
-                <span>{t('home.btnLogin')}</span>
+                <span>{t('home.btnBook', 'Book a Slot')}</span>
+                <ArrowRight className="w-4 h-4" />
               </Link>
-            )}
+
+              {role !== 'FARMER' && (
+                <Link
+                  to="/login"
+                  className="bg-white/10 hover:bg-white/20 text-white font-semibold px-5 py-2.5 rounded border border-white/40 transition"
+                >
+                  {t('home.btnLogin', 'Login')}
+                </Link>
+              )}
+            </div>
           </div>
         </div>
+        <TricolorStrip />
       </section>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
-        {/* Core Services Grid */}
-        <section className="space-y-6">
-          <div className="text-center space-y-1">
-            <h2 className="text-2xl sm:text-3xl font-bold text-navy-900">
-              {t('home.servicesTitle')}
-            </h2>
-            <p className="text-sm text-slate-600">
-              All digital services designed for seamless, predictable, and fair procurement
+      {/* Quote/Vision Section */}
+      <section className="bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12">
+          <div className="max-w-3xl">
+            <h2 className="text-xl sm:text-2xl font-bold text-ink">A digitally empowered kisan</h2>
+            <blockquote className="mt-4 border-l-4 border-india-saffron pl-4 text-lg italic text-ink">
+              “When the farmer of India is strong, the nation is strong. Technology must reach the farm and save the farmer's time.”
+            </blockquote>
+            <p className="mt-2 text-sm font-medium text-muted">— Vision of the Prime Minister of India for farmer welfare</p>
+            <p className="mt-4 text-sm text-muted max-w-reading">
+              Kisan Setu Portal takes that vision to the procurement centre: know your centre, book a slot in your own language, and arrive only when it is your turn.
             </p>
           </div>
+        </div>
+        <TricolorStrip />
+      </section>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+      {/* Core Services */}
+      <section className="bg-paper py-10 sm:py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="mb-6 text-xl font-bold text-ink">
+            {t('home.servicesTitle', 'What this portal does')}
+          </h2>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {services.map((s, idx) => (
               <Link
                 key={idx}
                 to={s.link}
-                className="bg-white rounded-xl p-5 border border-slate-200 shadow-sm hover:shadow-md transition group flex flex-col justify-between"
+                className="block bg-white p-5 rounded border border-line shadow-sm hover:shadow-md hover:border-india-green transition"
               >
-                <div className="space-y-3">
-                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center border ${s.color}`}>
-                    <s.icon className="w-6 h-6" />
-                  </div>
-                  <h3 className="text-lg font-bold text-slate-800 group-hover:text-navy-800 transition">
-                    {s.title}
-                  </h3>
-                  <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">{s.desc}</p>
+                <div className="w-10 h-10 rounded bg-green-50 flex items-center justify-center text-india-green mb-3">
+                  <s.icon className="w-5 h-5" />
                 </div>
-                <div className="mt-4 pt-3 border-t border-slate-100 flex items-center text-xs font-bold text-navy-800 gap-1 group-hover:gap-2 transition-all">
-                  <span>Access Service</span>
-                  <ChevronRight className="w-4 h-4" />
-                </div>
+                <h3 className="text-base font-semibold text-ink">{s.title}</h3>
+                <p className="mt-1 text-sm text-muted leading-relaxed">{s.desc}</p>
               </Link>
             ))}
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* How Kisan Setu Works (6-step visual path) */}
-        <section className="bg-white rounded-2xl p-6 sm:p-10 border border-slate-200 shadow-sm space-y-8">
-          <div className="text-center space-y-1">
-            <span className="text-xs uppercase tracking-wider text-agri-700 font-bold">Step-by-Step Guide</span>
-            <h2 className="text-2xl sm:text-3xl font-bold text-navy-900">
-              {t('home.howItWorksTitle')}
-            </h2>
-          </div>
-
+      {/* Step by step */}
+      <section className="bg-white py-10 sm:py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="mb-6 text-xl font-bold text-ink">
+            {t('home.howItWorksTitle', 'How to use this portal')}
+          </h2>
+          
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {steps.map((step, idx) => (
-              <div
-                key={idx}
-                className="p-5 rounded-xl bg-slate-50 border border-slate-200 relative flex flex-col justify-between space-y-2 hover:bg-slate-100/80 transition"
-              >
-                <div className="flex items-center justify-between">
-                  <span className="w-8 h-8 rounded-lg bg-navy-800 text-white font-bold text-sm flex items-center justify-center">
-                    {step.num}
-                  </span>
-                  <span className="text-xs font-medium text-slate-400">Step {step.num}</span>
+              <div key={idx} className="relative pl-12 pb-4">
+                <div className="absolute left-0 top-0 w-8 h-8 bg-india-green text-white font-bold rounded-full flex items-center justify-center text-sm shadow-sm">
+                  {step.num}
                 </div>
-                <h4 className="text-base font-bold text-slate-800 pt-1">{step.title}</h4>
-                <p className="text-xs text-slate-600 leading-relaxed">{step.desc}</p>
+                <h4 className="text-base font-bold text-ink pt-1">{step.title}</h4>
+                <p className="mt-1 text-sm text-muted leading-relaxed">{step.desc}</p>
               </div>
             ))}
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* Why Choose Kisan Setu */}
-        <section className="bg-navy-900 text-white rounded-2xl p-6 sm:p-10 shadow-md space-y-6">
-          <div className="text-center space-y-1">
-            <h2 className="text-2xl sm:text-3xl font-bold">{t('home.whyTitle')}</h2>
-            <p className="text-xs sm:text-sm text-slate-300">
-              Built for trust, speed, transparency, and accessible public service.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
+      {/* Why Choose */}
+      <section className="bg-india-green text-white py-10 sm:py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="mb-6 text-xl font-bold">{t('home.whyTitle', 'Built for transparency')}</h2>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
               { title: t('home.why1'), desc: 'Real-time queue predictions prevent hours of unproductive waiting in sun and dust.' },
               { title: t('home.why2'), desc: 'Automated weight calculation and grade verification prevent price manipulation.' },
               { title: t('home.why3'), desc: 'SMS updates and distance-based travel advisories keep you informed on the move.' },
               { title: t('home.why4'), desc: 'Full native language support in English, हिन्दी, and తెలుగు with high accessibility.' },
             ].map((item, idx) => (
-              <div key={idx} className="p-4 rounded-xl bg-navy-800 border border-navy-700 space-y-2">
-                <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
-                <h4 className="font-bold text-sm text-white">{item.title}</h4>
-                <p className="text-xs text-slate-300 leading-relaxed">{item.desc}</p>
+              <div key={idx} className="bg-white/10 p-4 rounded border border-white/20">
+                <CheckCircle2 className="w-5 h-5 text-india-saffron mb-2" />
+                <h4 className="font-bold text-sm text-white mb-1">{item.title}</h4>
+                <p className="text-sm text-green-50 leading-relaxed opacity-90">{item.desc}</p>
               </div>
             ))}
           </div>
-        </section>
-      </div>
+        </div>
+        <div className="mt-10">
+          <TricolorStrip />
+        </div>
+      </section>
     </div>
   );
 };
